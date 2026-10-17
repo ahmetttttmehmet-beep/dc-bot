@@ -64,7 +64,7 @@ const commands = [
 // --- BOT AÇILDIGINDA ÇALIŞACAK KISIM ---
 client.once('ready', async () => {
     console.log(`🚀 Bot ${client.user.tag} olarak tüm sistemleriyle aktif!`);
-
+client.user.setActivity('İstiklal Mahkemelerinde Çalışıyor');
     // Slash Komutlarını Discord'a Yükleme
     const rest = new REST({ version: '10' }).setToken(process.env.TOKEN);
     try {
