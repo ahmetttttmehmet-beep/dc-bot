@@ -1,3 +1,8 @@
+const express = require('express');
+const app = express();
+app.get('/', (req, res) => res.send('Bot 7/24 Aktif!'));
+app.listen(process.env.PORT || 10000, () => console.log('Web sunucusu hazır!'));
+
 const { 
     Client, 
     GatewayIntentBits, 
@@ -64,7 +69,10 @@ const commands = [
 // --- BOT AÇILDIGINDA ÇALIŞACAK KISIM ---
 client.once('ready', async () => {
     console.log(`🚀 Bot ${client.user.tag} olarak tüm sistemleriyle aktif!`);
-client.user.setActivity('İstiklal Mahkemelerinde Çalışıyor');
+
+    // Durum Yazısı
+    client.user.setActivity('İstiklal Mahkemelerinde Çalışıyor');
+
     // Slash Komutlarını Discord'a Yükleme
     const rest = new REST({ version: '10' }).setToken(process.env.TOKEN);
     try {
@@ -289,7 +297,7 @@ client.on('interactionCreate', async (interaction) => {
         await interaction.editReply({ content: `Destek talebiniz oluşturuldu: ${kanal}` });
     }
 
-    // Ticket Kapatma (Kanal Silme Garantili)
+    // Ticket Kapatma
     if (interaction.customId === 'ticket_kapat') {
         await interaction.reply("Destek talebi 3 saniye içinde kapatılıyor...");
         setTimeout(async () => {
