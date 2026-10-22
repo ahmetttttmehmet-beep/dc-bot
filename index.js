@@ -14,37 +14,48 @@ const client = new Client({
     ]
 });
 
+// --- ENGELLENMESİNİ İSTEDİĞİN ÖZEL KELİME LISTESİ ---
+const yasakliKelimeler = [
+    "*amk*", "*aq*", "*oç*", "*sg*", "*sik*", "*piç*", "*yarrak*", "*orospu*"
+]; // Yıldız (*) simgeleri kelimenin cümlenin içinde geçmesini de engeller.
+
 // --- BOT AÇILDIĞINDA ÇALIŞACAK KISIM ---
 client.once('ready', async () => {
-    console.log(`🚀 Bot ${client.user.tag} olarak aktif! Sadece Küfür/Argo koruması çalışıyor.`);
+    console.log(`🚀 Bot ${client.user.tag} olarak aktif! Özel Küfür/Argo koruması çalışıyor.`);
 
     // Durum Yazısı
     client.user.setActivity('İstiklal Mahkemelerinde Çalışıyor');
 
-    // --- OTOMATİK KÜFÜR VE ARGO FİLTRESİ (AutoMod) ---
+    // --- ÖZEL KELİME LİSTELİ AUTOMOD KURULUMU ---
     try {
         const guild = client.guilds.cache.first();
         if (guild) {
             const rules = await guild.autoModerationRules.fetch();
-            const ruleExists = rules.some(r => r.name === 'Otomatik Küfür Filtresi');
+            const existingRule = rules.find(r => r.name === 'Otomatik Küfür Filtresi');
 
-            if (!ruleExists) {
+            // Eğer eski kural varsa günceller, yoksa sıfırdan oluşturur
+            if (existingRule) {
+                await existingRule.edit({
+                    triggerMetadata: {
+                        keywordFilter: yasakliKelimeler
+                    }
+                });
+                console.log('🛡️ Küfür Filtresi kelime listesi güncellendi!');
+            } else {
                 await guild.autoModerationRules.create({
                     name: 'Otomatik Küfür Filtresi',
                     creatorId: client.user.id,
                     enabled: true,
                     eventType: 1, // MessageSend
-                    triggerType: 4, // Profanity (Discord Hazır Küfür/Argo Listesi)
+                    triggerType: 1, // Keyword (Özel Kelime Listesi)
                     triggerMetadata: {
-                        presets: [1] // Sadece Küfür ve Argo Filtresi
+                        keywordFilter: yasakliKelimeler
                     },
                     actions: [
-                        { type: 1 } // Mesajı Engelle
+                        { type: 1 } // Mesajı Göndermeyi Engelle
                     ]
                 });
-                console.log('🛡️ Otomatik Küfür ve Argo Filtresi başarıyla kuruldu!');
-            } else {
-                console.log('🛡️ Otomatik Küfür Filtresi zaten aktif.');
+                console.log('🛡️ Özel Küfür ve Argo Filtresi başarıyla kuruldu!');
             }
         }
     } catch (err) {
